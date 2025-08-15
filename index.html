@@ -6,123 +6,124 @@
 
     <!-- SEO Meta Tags -->
     <title>Get Weather 135 - Get Current weather info</title>
-    <meta name="description" content="Get the latest weather forecast for your city with Get Weather 135. Accurate and real-time weather updates on temperature, humidity, wind speed, and air quality.">
-    <meta name="keywords" content="weather, forecast, get weather 135, weather app, temperature, humidity, wind speed, air quality">
+    <meta name="description" content="Get the latest weather forecast for your city or coordinates with Get Weather 135. Accurate and real-time weather updates on temperature, humidity, wind speed, and air quality.">
+    <meta name="keywords" content="weather, forecast, get weather 135, coordinates, latitude, longitude, temperature, humidity, wind speed, air quality, map">
 
     <!-- Favicon Meta Tags -->
     <link rel="icon" href="favicon.png" type="image/png">
-
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://acegikmo135.github.io/weather">
     <meta property="og:title" content="Get Weather 135 - Accurate Weather Forecast">
-    <meta property="og:description" content="Get the latest weather forecast for your city with Get Weather 135. Accurate and real-time weather updates.">
+    <meta property="og:description" content="Get the latest weather forecast for your city or coordinates with Get Weather 135. Accurate and real-time weather updates.">
     <meta property="og:image" content="https://acegikmo135.github.io/weather/favicon.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- Leaflet.js for Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* Custom styles for the app */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #000000; /* Solid black background */
-            /* Allow vertical scrolling only when content overflows */
+            background-color: #000000;
             overflow-x: hidden;
             overflow-y: auto;
         }
         
-        /* Container for the particle effect background */
         #particles-js {
-            position: fixed; /* Use fixed to keep it in the background */
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: 0; /* Behind the content */
-            background-color: #000000; /* Solid black background for the particle canvas */
+            position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: 0; background-color: #000000;
         }
 
-        /* Ensure main content is on top of the particles */
         .content-container {
-            position: relative;
-            z-index: 1;
-            /* Make sure content is centered and can scroll */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
+            position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh;
         }
 
-        /* Glassmorphism effect for the main card */
         .glass-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        /* Styling for the input placeholder text */
-        ::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
+        ::placeholder { color: rgba(255, 255, 255, 0.6); }
 
-        /* Animation for weather details appearing */
-        .weather-info-container {
-            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        
-        .weather-info-container.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Staggered animation for individual weather items */
-        .weather-item {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.5s ease, transform 0.5s ease;
-        }
-        
-        .weather-info-container.visible .weather-item {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        
-        /* Applying transition delays for the staggered effect */
+        .weather-info-container { transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out; opacity: 0; transform: translateY(20px); }
+        .weather-info-container.visible { opacity: 1; transform: translateY(0); }
+        .weather-item { opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease, transform 0.5s ease; }
+        .weather-info-container.visible .weather-item { opacity: 1; transform: translateY(0); }
         .weather-info-container.visible .weather-item:nth-child(1) { transition-delay: 0.2s; }
         .weather-info-container.visible .weather-item:nth-child(2) { transition-delay: 0.3s; }
         .weather-info-container.visible .weather-item:nth-child(3) { transition-delay: 0.4s; }
         .weather-info-container.visible .weather-item:nth-child(4) { transition-delay: 0.5s; }
         .weather-info-container.visible .weather-item:nth-child(5) { transition-delay: 0.6s; }
+
+        /* Map Modal Styles */
+        #mapModal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); z-index: 1000;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        #mapModal.visible { opacity: 1; visibility: visible; }
+        .map-content {
+            position: relative; width: 90%; height: 85%; max-width: 1000px;
+            background-color: #ffffff; border-radius: 1.5rem; overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column;
+        }
+        #map { height: 100%; width: 100%; z-index: 1; }
+        .leaflet-container { background: #f0f0f0; } /* Light background for map tiles */
+        
+        /* Custom buttons for map */
+        .map-button {
+            position: absolute; z-index: 10; cursor: pointer;
+            background: rgba(255, 255, 255, 0.7); color: #333;
+            border-radius: 50%; width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            border: 1px solid rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px);
+            transition: background 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .map-button:hover { background: rgba(255, 255, 255, 1); }
+        #closeMapBtn { top: 15px; right: 15px; }
+        #selectLocationBtn {
+            bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: auto; padding: 10px 20px; border-radius: 20px;
+            font-weight: 600; background: #3b82f6; color: white; border: none;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+        #selectLocationBtn:hover { background: #2563eb; }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4">
 
     <div id="particles-js"></div>
 
+    <!-- Main Content -->
     <div class="w-full max-w-md mx-auto content-container">
         <div class="glass-card rounded-3xl shadow-2xl p-6 md:p-8 text-white text-center">
             
             <h1 id="appTitle" class="text-3xl md:text-4xl font-bold mb-2">Get Weather 135</h1>
-            <p id="appSubtitle" class="text-white/80 mb-6">Enter a city name to get the weather forecast with Get Weather 135</p>
+            <p id="appSubtitle" class="text-white/80 mb-6">Enter a city or coordinates to get the forecast</p>
             
             <div class="flex justify-end mb-4">
                 <button id="langSwitchBtn" class="bg-white/20 text-white border-2 border-white/30 rounded-full px-4 py-2 text-sm hover:bg-white/30 transition duration-300">
-                    Switch to English
+                    Switch to Gujarati
                 </button>
             </div>
 
             <div class="flex items-center space-x-2">
-                <input type="text" id="cityInput" placeholder="દા.ત., રાજકોટ" class="w-full bg-white/20 border-2 border-white/30 rounded-full px-5 py-3 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50 transition duration-300">
-                <button id="getWeatherBtn" class="bg-white text-blue-500 rounded-full p-3 hover:bg-opacity-90 transform hover:scale-110 transition duration-300 shadow-lg">
+                <input type="text" id="cityInput" placeholder="e.g., Rajkot or 22.3° N, 70.8° E" class="w-full bg-white/20 border-2 border-white/30 rounded-full px-5 py-3 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50 transition duration-300">
+                <button id="openMapBtn" title="Select on Map" class="bg-white/20 text-white rounded-full p-3 hover:bg-white/30 transform hover:scale-110 transition duration-300 shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </button>
+                <button id="getWeatherBtn" title="Search" class="bg-white text-blue-500 rounded-full p-3 hover:bg-opacity-90 transform hover:scale-110 transition duration-300 shadow-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
@@ -153,23 +154,36 @@
                 
                 <div class="grid grid-cols-2 gap-4 text-left">
                     <div class="weather-item glass-card p-4 rounded-xl">
-                        <p id="humidityLabel" class="text-sm text-white/70">ભેજ</p>
+                        <p id="humidityLabel" class="text-sm text-white/70">Humidity</p>
                         <p id="humidity" class="text-2xl font-semibold"></p>
                     </div>
                     <div class="weather-item glass-card p-4 rounded-xl">
-                        <p id="windSpeedLabel" class="text-sm text-white/70">પવનની ગતિ</p>
+                        <p id="windSpeedLabel" class="text-sm text-white/70">Wind Speed</p>
                         <p id="windSpeed" class="text-2xl font-semibold"></p>
                     </div>
                     <div class="weather-item glass-card p-4 rounded-xl">
-                        <p id="feelsLikeLabel" class="text-sm text-white/70">અનુભવાતી ગરમી</p>
+                        <p id="feelsLikeLabel" class="text-sm text-white/70">Feels Like</p>
                         <p id="feelsLike" class="text-2xl font-semibold"></p>
                     </div>
                     <div class="weather-item glass-card p-4 rounded-xl">
-                        <p id="aqiLabel" class="text-sm text-white/70">હવાની ગુણવત્તા</p>
+                        <p id="aqiLabel" class="text-sm text-white/70">Air Quality</p>
                         <p id="aqi" class="text-2xl font-semibold"></p>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Map Modal -->
+    <div id="mapModal">
+        <div class="map-content">
+            <button id="closeMapBtn" class="map-button" title="Close Map">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <div id="map"></div>
+            <button id="selectLocationBtn" class="map-button hidden">Select This Location</button>
         </div>
     </div>
     
@@ -180,8 +194,8 @@
         const translations = {
             en: {
                 appTitle: "Get Weather 135",
-                appSubtitle: "Enter a city to get the latest forecast with Get Weather 135",
-                cityInputPlaceholder: "e.g., Rajkot",
+                appSubtitle: "Enter a city or coordinates to get the forecast",
+                cityInputPlaceholder: "e.g., Rajkot or 22.3° N, 70.8° E",
                 langSwitchBtn: "Switch to Gujarati",
                 humidityLabel: "Humidity",
                 windSpeedLabel: "Wind Speed",
@@ -192,16 +206,17 @@
                 aqiModerate: "Moderate",
                 aqiPoor: "Poor",
                 aqiVeryPoor: "Very Poor",
-                errorNoCity: "Please enter a city name.",
-                errorCityNotFound: "City not found: ",
+                errorNoInput: "Please enter a city name or coordinates.",
+                errorInvalidCoords: "Invalid coordinates. Use format: 22.3° N, 70.8° E",
+                errorNotFound: "Location not found. Please check the name or coordinates.",
                 errorInvalidApiKey: "Invalid API Key. Please check your key in the script.",
                 errorAqiFetch: "Could not fetch air quality data.",
                 errorHttp: "HTTP error! status: "
             },
             gu: {
                 appTitle: "વેધર એપ",
-                appSubtitle: "હવામાનની આગાહી મેળવવા માટે શહેરનું નામ દાખલ કરો",
-                cityInputPlaceholder: "દા.ત., રાજકોટ",
+                appSubtitle: "આગાહી મેળવવા માટે શહેર અથવા કોઓર્ડિનેટ્સ દાખલ કરો",
+                cityInputPlaceholder: "દા.ત., રાજકોટ અથવા 22.3° N, 70.8° E",
                 langSwitchBtn: "Switch to English",
                 humidityLabel: "ભેજ",
                 windSpeedLabel: "પવનની ગતિ",
@@ -212,8 +227,9 @@
                 aqiModerate: "મધ્યમ",
                 aqiPoor: "ખરાબ",
                 aqiVeryPoor: "ખૂબ જ ખરાબ",
-                errorNoCity: "કૃપા કરીને શહેરનું નામ દાખલ કરો.",
-                errorCityNotFound: "શહેર મળ્યું નથી: ",
+                errorNoInput: "કૃપા કરીને શહેરનું નામ અથવા કોઓર્ડિનેટ્સ દાખલ કરો.",
+                errorInvalidCoords: "અમાન્ય કોઓર્ડિનેટ્સ. ફોર્મેટનો ઉપયોગ કરો: 22.3° N, 70.8° E",
+                errorNotFound: "સ્થાન મળ્યું નથી. કૃપા કરીને નામ અથવા કોઓર્ડિનેટ્સ તપાસો.",
                 errorInvalidApiKey: "અમાન્ય API કી. કૃપા કરીને સ્ક્રિપ્ટમાં તમારી કી તપાસો.",
                 errorAqiFetch: "હવાની ગુણવત્તાનો ડેટા મેળવી શકાયો નથી.",
                 errorHttp: "HTTP ભૂલ! સ્થિતિ: "
@@ -228,15 +244,12 @@
         const errorBox = document.getElementById('errorBox');
         const errorMessage = document.getElementById('errorMessage');
         const weatherInfoContainer = document.getElementById('weatherInfo');
-        
-        // Elements to be translated
         const appTitle = document.getElementById('appTitle');
         const appSubtitle = document.getElementById('appSubtitle');
         const humidityLabel = document.getElementById('humidityLabel');
         const windSpeedLabel = document.getElementById('windSpeedLabel');
         const feelsLikeLabel = document.getElementById('feelsLikeLabel');
         const aqiLabel = document.getElementById('aqiLabel');
-
         const cityNameEl = document.getElementById('cityName');
         const weatherIconEl = document.getElementById('weatherIcon');
         const temperatureEl = document.getElementById('temperature');
@@ -245,81 +258,137 @@
         const windSpeedEl = document.getElementById('windSpeed');
         const feelsLikeEl = document.getElementById('feelsLike');
         const aqiEl = document.getElementById('aqi');
+        
+        // Map elements
+        const openMapBtn = document.getElementById('openMapBtn');
+        const mapModal = document.getElementById('mapModal');
+        const closeMapBtn = document.getElementById('closeMapBtn');
+        const selectLocationBtn = document.getElementById('selectLocationBtn');
+        const mapContainer = document.getElementById('map');
 
         // --- API Configuration ---
-        // IMPORTANT: Replace "YOUR_API_KEY" with your actual OpenWeatherMap API key.
         const apiKey = "dfe3aa984645945c48c888717a720b14";
-        
-        let currentLang = 'gu'; // Default language is Gujarati
+        let currentLang = 'en';
 
+        // --- Map Variables ---
+        let map;
+        let marker;
+        let selectedCoords = null;
+        
         // --- Event Listeners ---
         getWeatherBtn.addEventListener('click', handleGetWeather);
         cityInput.addEventListener('keyup', (event) => {
-            if (event.key === 'Enter') {
-                handleGetWeather();
-            }
+            if (event.key === 'Enter') handleGetWeather();
         });
         langSwitchBtn.addEventListener('click', switchLanguage);
         
-        // Set initial language
-        updateUIForLanguage();
+        openMapBtn.addEventListener('click', () => {
+            mapModal.classList.add('visible');
+            initMap();
+        });
+        closeMapBtn.addEventListener('click', () => {
+            mapModal.classList.remove('visible');
+        });
+        selectLocationBtn.addEventListener('click', () => {
+            if (selectedCoords) {
+                const lat = selectedCoords.lat;
+                const lng = selectedCoords.lng;
+                
+                const latDir = lat >= 0 ? 'N' : 'S';
+                const lonDir = lng >= 0 ? 'E' : 'W';
+                const latVal = Math.abs(lat).toFixed(4);
+                const lonVal = Math.abs(lng).toFixed(4);
+
+                cityInput.value = `${latVal}° ${latDir}, ${lonVal}° ${lonDir}`;
+                mapModal.classList.remove('visible');
+                handleGetWeather();
+            }
+        });
+
+        // --- Initialize Map Function ---
+        function initMap() {
+            if (!map) {
+                map = L.map(mapContainer).setView([20, 0], 2);
+                
+                // ** CHANGED TO LIGHT MAP TILE LAYER **
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
+
+                map.on('click', function(e) {
+                    selectedCoords = e.latlng;
+                    if (!marker) {
+                        marker = L.marker(selectedCoords).addTo(map);
+                    } else {
+                        marker.setLatLng(selectedCoords);
+                    }
+                    selectLocationBtn.classList.remove('hidden');
+                });
+            }
+            setTimeout(() => map.invalidateSize(), 100);
+        }
 
         // --- Main Function to Fetch and Display Weather ---
         async function handleGetWeather() {
-            const city = cityInput.value.trim();
-            if (!city) {
-                showError(translations[currentLang].errorNoCity);
+            const input = cityInput.value.trim();
+            if (!input) {
+                showError(translations[currentLang].errorNoInput);
                 return;
             }
 
-            // Reset UI state
             hideError();
             weatherInfoContainer.classList.remove('visible');
             loader.classList.remove('hidden');
 
+            const coordRegex = /^(\d{1,2}(?:\.\d+)?)\s*°?\s*([NS])\s*,\s*(\d{1,3}(?:\.\d+)?)\s*°?\s*([EW])$/i;
+            const match = input.match(coordRegex);
+            let weatherApiUrl;
+
+            if (match) {
+                let lat = parseFloat(match[1]);
+                const latDir = match[2].toUpperCase();
+                let lon = parseFloat(match[3]);
+                const lonDir = match[4].toUpperCase();
+                if (latDir === 'S') lat = -lat;
+                if (lonDir === 'W') lon = -lon;
+                weatherApiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
+            } else if (input.includes('°') || (input.includes(',') && /[a-zA-Z]/.test(input))) {
+                loader.classList.add('hidden');
+                showError(translations[currentLang].errorInvalidCoords);
+                return;
+            } else {
+                weatherApiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(input)}&appid=${apiKey}&units=metric`;
+            }
+
             try {
-                // Step 1: Fetch current weather data to get coordinates
-                const weatherResponse = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`);
-                
+                const weatherResponse = await fetch(weatherApiUrl);
                 if (!weatherResponse.ok) {
-                    if (weatherResponse.status === 404) {
-                        throw new Error(`${translations[currentLang].errorCityNotFound}${city}`);
-                    } else if (weatherResponse.status === 401) {
-                         throw new Error(translations[currentLang].errorInvalidApiKey);
-                    }
-                    else {
-                        throw new Error(`${translations[currentLang].errorHttp}${weatherResponse.status}`);
-                    }
+                    if (weatherResponse.status === 404) throw new Error(translations[currentLang].errorNotFound);
+                    if (weatherResponse.status === 401) throw new Error(translations[currentLang].errorInvalidApiKey);
+                    throw new Error(`${translations[currentLang].errorHttp}${weatherResponse.status}`);
                 }
                 const weatherData = await weatherResponse.json();
                 
-                // Step 2: Use coordinates to fetch air pollution data
                 const { lat, lon } = weatherData.coord;
                 const airPollutionResponse = await fetch(`https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`);
-                if (!airPollutionResponse.ok) {
-                    throw new Error(translations[currentLang].errorAqiFetch);
-                }
+                if (!airPollutionResponse.ok) throw new Error(translations[currentLang].errorAqiFetch);
                 const airPollutionData = await airPollutionResponse.json();
 
-                // Step 3: Update the UI with the fetched data
                 updateUI(weatherData, airPollutionData);
 
             } catch (error) {
                 console.error("Error fetching weather data:", error);
                 showError(error.message);
             } finally {
-                // Hide loader regardless of success or failure
                 loader.classList.add('hidden');
             }
         }
 
         // --- UI Update Functions ---
         function updateUI(weather, air) {
-            // Destructure data for easier access
             const { name, main, weather: weatherDetails, wind } = weather;
             const aqiValue = air.list[0].main.aqi;
-
-            // Update text content
             cityNameEl.textContent = name;
             temperatureEl.textContent = `${Math.round(main.temp)}°C`;
             weatherDescriptionEl.textContent = weatherDetails[0].description;
@@ -327,11 +396,7 @@
             windSpeedEl.textContent = `${wind.speed.toFixed(1)} m/s`;
             feelsLikeEl.textContent = `${Math.round(main.feels_like)}°C`;
             aqiEl.textContent = getAqiText(aqiValue);
-
-            // Update weather icon
             weatherIconEl.innerHTML = getWeatherIcon(weatherDetails[0].id);
-
-            // Make the weather info visible with animation
             weatherInfoContainer.classList.add('visible');
         }
 
@@ -347,12 +412,13 @@
         function switchLanguage() {
             currentLang = currentLang === 'en' ? 'gu' : 'en';
             updateUIForLanguage();
-            // Clear any old weather info when switching languages
             weatherInfoContainer.classList.remove('visible');
+            hideError();
         }
         
         function updateUIForLanguage() {
             const lang = translations[currentLang];
+            document.documentElement.lang = currentLang === 'gu' ? 'gu' : 'en';
             appTitle.textContent = lang.appTitle;
             appSubtitle.textContent = lang.appSubtitle;
             cityInput.placeholder = lang.cityInputPlaceholder;
@@ -361,111 +427,36 @@
             windSpeedLabel.textContent = lang.windSpeedLabel;
             feelsLikeLabel.textContent = lang.feelsLikeLabel;
             aqiLabel.textContent = lang.aqiLabel;
-            
-            // If weather info is visible, update the labels and AQI text
-            if (weatherInfoContainer.classList.contains('visible')) {
-                const aqiValue = parseInt(aqiEl.textContent); // Get current AQI value
-                aqiEl.textContent = getAqiText(aqiValue);
-            }
         }
 
         // --- Helper Functions ---
         function getAqiText(aqi) {
+            const lang = translations[currentLang];
             switch (aqi) {
-                case 1: return translations[currentLang].aqiGood;
-                case 2: return translations[currentLang].aqiFair;
-                case 3: return translations[currentLang].aqiModerate;
-                case 4: return translations[currentLang].aqiPoor;
-                case 5: return translations[currentLang].aqiVeryPoor;
-                default: return "N/A"; // Or handle this case appropriately
+                case 1: return lang.aqiGood;
+                case 2: return lang.aqiFair;
+                case 3: return lang.aqiModerate;
+                case 4: return lang.aqiPoor;
+                case 5: return lang.aqiVeryPoor;
+                default: return "N/A";
             }
         }
 
         function getWeatherIcon(conditionId) {
-            // This function returns an SVG icon based on the weather condition ID from the API.
-            if (conditionId >= 200 && conditionId < 300) { // Thunderstorm
-                return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" class="w-full h-full"><path d="M47.5 31.5h-6l-4 13h-6l4-13h-6l-4.5 20h27L47.5 31.5z" fill="#f4a71d"/><path d="M30 15.5l-3 7h5l-2 4.5h4l-1.5 4h5l-2.5 6h-12l10-21.5h-5.5z" fill="#f4a71d"/><path d="M47.7 21.5c-7.2-2-14.2 2.1-16.2 9.3l-2.3-1.3c-1.5-1-3.2-1.5-5-1.5-4.4 0-8 3.6-8 8s3.6 8 8 8h27c4.4 0 8-3.6 8-8 .1-4.3-3.3-7.8-7.5-8z" fill="#66757f"/><path d="M47.7 21.5c-7.2-2-14.2 2.1-16.2 9.3l-2.3-1.3c-1.5-1-3.2-1.5-5-1.5-4.4 0-8 3.6-8 8s3.6 8 8 8h27c4.4 0 8-3.6 8-8 .1-4.3-3.3-7.8-7.5-8z" fill="#e6e7e8" opacity=".6"/></svg>`;
-            } else if (conditionId >= 300 && conditionId < 600) { // Drizzle & Rain
-                return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" class="w-full h-full"><path d="M47.7 21.5c-7.2-2-14.2 2.1-16.2 9.3l-2.3-1.3c-1.5-1-3.2-1.5-5-1.5-4.4 0-8 3.6-8 8s3.6 8 8 8h27c4.4 0 8-3.6 8-8 .1-4.3-3.3-7.8-7.5-8z" fill="#66757f"/><path d="M47.7 21.5c-7.2-2-14.2 2.1-16.2 9.3l-2.3-1.3c-1.5-1-3.2-1.5-5-1.5-4.4 0-8 3.6-8 8s3.6 8 8 8h27c4.4 0 8-3.6 8-8 .1-4.3-3.3-7.8-7.5-8z" fill="#e6e7e8" opacity=".6"/><path d="M22 43.5c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2s2-.9 2-2v-6c0-1.1-.9-2-2-2zm8 0c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2s2-.9 2-2v-6c0-1.1-.9-2-2-2zm8 0c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2s2-.9 2-2v-6c0-1.1-.9-2-2-2z" fill="#428bc1"/></svg>`;
-            } else if (conditionId >= 600 && conditionId < 700) { // Snow
-                return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" class="w-full h-full"><path d="M47.7 21.5c-7.2-2-14.2 2.1-16.2 9.3l-2.3-1.3c-1.5-1-3.2-1.5-5-1.5-4.4 0-8 3.6-8 8s3.6 8 8 8h27c4.4 0 8-3.6 8-8 .1-4.3-3.3-7.8-7.5-8z" fill="#66757f"/><path d="M47.7 21.5c-7.2-2-14.2 2.1-16.2 9.3l-2.3-1.3c-1.5-1-3.2-1.5-5-1.5-4.4 0-8 3.6-8 8s3.6 8 8 8h27c4.4 0 8-3.6 8-8 .1-4.3-3.3-7.8-7.5-8z" fill="#e6e7e8" opacity=".6"/><path d="M24.5 45.3l-2.1 2.1 1.4 1.4 2.1-2.1-1.4-1.4zm-2.1-2.1l2.1-2.1-1.4-1.4-2.1 2.1 1.4 1.4zm3.5 3.5l2.1 2.1-1.4 1.4-2.1-2.1 1.4-1.4zm3.5-3.5l-2.1 2.1 1.4 1.4 2.1-2.1-1.4-1.4zm-2.1-2.1l2.1-2.1-1.4-1.4-2.1 2.1 1.4 1.4zm3.5 3.5l2.1 2.1-1.4 1.4-2.1-2.1 1.4-1.4zm3.5-3.5l-2.1 2.1 1.4 1.4 2.1-2.1-1.4-1.4zm-2.1-2.1l2.1-2.1-1.4-1.4-2.1 2.1 1.4 1.4z" fill="#fff"/></svg>`;
-            } else if (conditionId >= 700 && conditionId < 800) { // Atmosphere (Mist, Fog, etc.)
-                return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" class="w-full h-full"><path d="M18.5 25.5h27c4.4 0 8-3.6 8-8s-3.6-8-8-8c-1.8 0-3.5.6-5 1.5l-2.3 1.3c-2-7.2-9-11.3-16.2-9.3-4.2 1.2-7.5 4.7-8.5 9.1-3.2-.4-6.2 1.5-7.3 4.4-1.1 2.9-.1 6.2 2.3 7.9l2.5 1.1z" fill="#66757f"/><path d="M18.5 25.5h27c4.4 0 8-3.6 8-8s-3.6-8-8-8c-1.8 0-3.5.6-5 1.5l-2.3 1.3c-2-7.2-9-11.3-16.2-9.3-4.2 1.2-7.5 4.7-8.5 9.1-3.2-.4-6.2 1.5-7.3 4.4-1.1 2.9-.1 6.2 2.3 7.9l2.5 1.1z" fill="#e6e7e8" opacity=".6"/><path d="M14.5 33.5h35v4h-35zm0 8h35v4h-35zm0 8h35v4h-35z" fill="#66757f"/></svg>`;
-            } else if (conditionId === 800) { // Clear
-                return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" class="w-full h-full"><path d="M32 13.5c-10.2 0-18.5 8.3-18.5 18.5S21.8 50.5 32 50.5 50.5 42.2 50.5 32 42.2 13.5 32 13.5zm0 33c-8 0-14.5-6.5-14.5-14.5S24 17.5 32 17.5s14.5 6.5 14.5 14.5S40 46.5 32 46.5z" fill="#f4a71d"/><path d="M32 4.5c-1.1 0-2 .9-2 2v5c0 1.1.9 2 2 2s2-.9 2-2v-5c0-1.1-.9-2-2-2zm0 48c-1.1 0-2 .9-2 2v5c0 1.1.9 2 2 2s2-.9 2-2v-5c0-1.1-.9-2-2-2zm22.4-31.9c-.8-.8-2-.8-2.8 0l-3.5 3.5c-.8.8-.8 2 0 2.8.4.4.9.6 1.4.6s1-.2 1.4-.6l3.5-3.5c.8-.8.8-2 0-2.8zM14.9 49.1c-.8-.8-2-.8-2.8 0l-3.5 3.5c-.8.8-.8 2 0 2.8.4.4.9.6 1.4.6s1-.2 1.4-.6l3.5-3.5c.8-.8.8-2 0-2.8zm-.7-23.5c.4.4.9.6 1.4.6s1-.2 1.4-.6l3.5-3.5c.8-.8.8-2 0-2.8s-2-.8-2.8 0l-3.5 3.5c-.8.8-.8 2 0 2.8zm35.4 0c.8.8.8 2 0 2.8l-3.5 3.5c-.8.8-2 .8-2.8 0s-.8-2 0-2.8l3.5-3.5c.8-.8 2-.8 2.8 0zM59.5 30h-5c-1.1 0-2 .9-2 2s.9 2 2 2h5c1.1 0 2-.9 2-2s-.9-2-2-2zm-48 0h-5c-1.1 0-2 .9-2 2s.9 2 2 2h5c1.1 0 2-.9 2-2s-.9-2-2-2z" fill="#f4a71d"/></svg>`;
-            } else if (conditionId > 800) { // Clouds
-                return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" class="w-full h-full"><path d="M47.7 21.5c-7.2-2-14.2 2.1-16.2 9.3l-2.3-1.3c-1.5-1-3.2-1.5-5-1.5-4.4 0-8 3.6-8 8s3.6 8 8 8h27c4.4 0 8-3.6 8-8 .1-4.3-3.3-7.8-7.5-8z" fill="#66757f"/><path d="M47.7 21.5c-7.2-2-14.2 2.1-16.2 9.3l-2.3-1.3c-1.5-1-3.2-1.5-5-1.5-4.4 0-8 3.6-8 8s3.6 8 8 8h27c4.4 0 8-3.6 8-8 .1-4.3-3.3-7.8-7.5-8z" fill="#e6e7e8" opacity=".6"/></svg>`;
-            }
-            return ''; // Default empty
+            if (conditionId >= 200 && conditionId < 300) return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" class="w-full h-full"><path d="M47.5 31.5h-6l-4 13h-6l4-13h-6l-4.5 20h27L47.5 31.5z" fill="#f4a71d"/><path d="M30 15.5l-3 7h5l-2 4.5h4l-1.5 4h5l-2.5 6h-12l10-21.5h-5.5z" fill="#f4a71d"/><path d="M47.7 21.5c-7.2-2-14.2 2.1-16.2 9.3l-2.3-1.3c-1.5-1-3.2-1.5-5-1.5-4.4 0-8 3.6-8 8s3.6 8 8 8h27c4.4 0 8-3.6 8-8 .1-4.3-3.3-7.8-7.5-8z" fill="#66757f"/><path d="M47.7 21.5c-7.2-2-14.2 2.1-16.2 9.3l-2.3-1.3c-1.5-1-3.2-1.5-5-1.5-4.4 0-8 3.6-8 8s3.6 8 8 8h27c4.4 0 8-3.6 8-8 .1-4.3-3.3-7.8-7.5-8z" fill="#e6e7e8" opacity=".6"/></svg>`;
+            if (conditionId >= 300 && conditionId < 600) return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" class="w-full h-full"><path d="M47.7 21.5c-7.2-2-14.2 2.1-16.2 9.3l-2.3-1.3c-1.5-1-3.2-1.5-5-1.5-4.4 0-8 3.6-8 8s3.6 8 8 8h27c4.4 0 8-3.6 8-8 .1-4.3-3.3-7.8-7.5-8z" fill="#66757f"/><path d="M47.7 21.5c-7.2-2-14.2 2.1-16.2 9.3l-2.3-1.3c-1.5-1-3.2-1.5-5-1.5-4.4 0-8 3.6-8 8s3.6 8 8 8h27c4.4 0 8-3.6 8-8 .1-4.3-3.3-7.8-7.5-8z" fill="#e6e7e8" opacity=".6"/><path d="M22 43.5c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2s2-.9 2-2v-6c0-1.1-.9-2-2-2zm8 0c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2s2-.9 2-2v-6c0-1.1-.9-2-2-2zm8 0c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2s2-.9 2-2v-6c0-1.1-.9-2-2-2z" fill="#428bc1"/></svg>`;
+            if (conditionId >= 600 && conditionId < 700) return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" class="w-full h-full"><path d="M47.7 21.5c-7.2-2-14.2 2.1-16.2 9.3l-2.3-1.3c-1.5-1-3.2-1.5-5-1.5-4.4 0-8 3.6-8 8s3.6 8 8 8h27c4.4 0 8-3.6 8-8 .1-4.3-3.3-7.8-7.5-8z" fill="#66757f"/><path d="M47.7 21.5c-7.2-2-14.2 2.1-16.2 9.3l-2.3-1.3c-1.5-1-3.2-1.5-5-1.5-4.4 0-8 3.6-8 8s3.6 8 8 8h27c4.4 0 8-3.6 8-8 .1-4.3-3.3-7.8-7.5-8z" fill="#e6e7e8" opacity=".6"/><path d="M24.5 45.3l-2.1 2.1 1.4 1.4 2.1-2.1-1.4-1.4zm-2.1-2.1l2.1-2.1-1.4-1.4-2.1 2.1 1.4 1.4zm3.5 3.5l2.1 2.1-1.4 1.4-2.1-2.1 1.4-1.4zm3.5-3.5l-2.1 2.1 1.4 1.4 2.1-2.1-1.4-1.4zm-2.1-2.1l2.1-2.1-1.4-1.4-2.1 2.1 1.4 1.4zm3.5 3.5l2.1 2.1-1.4 1.4-2.1-2.1 1.4-1.4zm3.5-3.5l-2.1 2.1 1.4 1.4 2.1-2.1-1.4-1.4zm-2.1-2.1l2.1-2.1-1.4-1.4-2.1 2.1 1.4 1.4z" fill="#fff"/></svg>`;
+            if (conditionId >= 700 && conditionId < 800) return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" class="w-full h-full"><path d="M18.5 25.5h27c4.4 0 8-3.6 8-8s-3.6-8-8-8c-1.8 0-3.5.6-5 1.5l-2.3 1.3c-2-7.2-9-11.3-16.2-9.3-4.2 1.2-7.5 4.7-8.5 9.1-3.2-.4-6.2 1.5-7.3 4.4-1.1 2.9-.1 6.2 2.3 7.9l2.5 1.1z" fill="#66757f"/><path d="M18.5 25.5h27c4.4 0 8-3.6 8-8s-3.6-8-8-8c-1.8 0-3.5.6-5 1.5l-2.3 1.3c-2-7.2-9-11.3-16.2-9.3-4.2 1.2-7.5 4.7-8.5 9.1-3.2-.4-6.2 1.5-7.3 4.4-1.1 2.9-.1 6.2 2.3 7.9l2.5 1.1z" fill="#e6e7e8" opacity=".6"/><path d="M14.5 33.5h35v4h-35zm0 8h35v4h-35zm0 8h35v4h-35z" fill="#66757f"/></svg>`;
+            if (conditionId === 800) return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" class="w-full h-full"><path d="M32 13.5c-10.2 0-18.5 8.3-18.5 18.5S21.8 50.5 32 50.5 50.5 42.2 50.5 32 42.2 13.5 32 13.5zm0 33c-8 0-14.5-6.5-14.5-14.5S24 17.5 32 17.5s14.5 6.5 14.5 14.5S40 46.5 32 46.5z" fill="#f4a71d"/><path d="M32 4.5c-1.1 0-2 .9-2 2v5c0 1.1.9 2 2 2s2-.9 2-2v-5c0-1.1-.9-2-2-2zm0 48c-1.1 0-2 .9-2 2v5c0 1.1.9 2 2 2s2-.9 2-2v-5c0-1.1-.9-2-2-2zm22.4-31.9c-.8-.8-2-.8-2.8 0l-3.5 3.5c-.8.8-.8 2 0 2.8.4.4.9.6 1.4.6s1-.2 1.4-.6l3.5-3.5c.8-.8.8-2 0-2.8zM14.9 49.1c-.8-.8-2-.8-2.8 0l-3.5 3.5c-.8.8-.8 2 0 2.8.4.4.9.6 1.4.6s1-.2 1.4-.6l3.5-3.5c.8-.8.8-2 0-2.8zm-.7-23.5c.4.4.9.6 1.4.6s1-.2 1.4-.6l3.5-3.5c.8-.8.8-2 0-2.8s-2-.8-2.8 0l-3.5 3.5c-.8.8-.8 2 0 2.8zm35.4 0c.8.8.8 2 0 2.8l-3.5 3.5c-.8.8-2 .8-2.8 0s-.8-2 0-2.8l3.5-3.5c.8-.8 2-.8 2.8 0zM59.5 30h-5c-1.1 0-2 .9-2 2s.9 2 2 2h5c1.1 0 2-.9 2-2s-.9-2-2-2zm-48 0h-5c-1.1 0-2 .9-2 2s.9 2 2 2h5c1.1 0 2-.9 2-2s-.9-2-2-2z" fill="#f4a71d"/></svg>`;
+            if (conditionId > 800) return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" class="w-full h-full"><path d="M47.7 21.5c-7.2-2-14.2 2.1-16.2 9.3l-2.3-1.3c-1.5-1-3.2-1.5-5-1.5-4.4 0-8 3.6-8 8s3.6 8 8 8h27c4.4 0 8-3.6 8-8 .1-4.3-3.3-7.8-7.5-8z" fill="#66757f"/><path d="M47.7 21.5c-7.2-2-14.2 2.1-16.2 9.3l-2.3-1.3c-1.5-1-3.2-1.5-5-1.5-4.4 0-8 3.6-8 8s3.6 8 8 8h27c4.4 0 8-3.6 8-8 .1-4.3-3.3-7.8-7.5-8z" fill="#e6e7e8" opacity=".6"/></svg>`;
+            return '';
         }
-        
-        // --- Initialize Particles.js ---
-        particlesJS('particles-js', {
-          "particles": {
-            "number": {
-              "value": 80,
-              "density": {
-                "enable": true,
-                "value_area": 800
-              }
-            },
-            "color": {
-              "value": "#ffffff"
-            },
-            "shape": {
-              "type": "circle"
-            },
-            "opacity": {
-              "value": 0.5,
-              "random": true
-            },
-            "size": {
-              "value": 3,
-              "random": true
-            },
-            "line_linked": {
-              "enable": true,
-              "distance": 150,
-              "color": "#ffffff",
-              "opacity": 0.4,
-              "width": 1
-            },
-            "move": {
-              "enable": true,
-              "speed": 2,
-              "direction": "none",
-              "random": false,
-              "straight": false,
-              "out_mode": "out",
-              "bounce": false
-            }
-          },
-          "interactivity": {
-            "detect_on": "canvas",
-            "events": {
-              "onhover": {
-                "enable": true,
-                "mode": "repulse"
-              },
-              "onclick": {
-                "enable": true,
-                "mode": "push"
-              },
-              "resize": true
-            },
-            "modes": {
-              "repulse": {
-                "distance": 100,
-                "duration": 0.4
-              },
-              "push": {
-                "particles_nb": 4
-              }
-            }
-          },
-          "retina_detect": true
-        });
 
+        // --- Initialize Particles.js ---
+        particlesJS('particles-js', { "particles": { "number": { "value": 80, "density": { "enable": true, "value_area": 800 } }, "color": { "value": "#ffffff" }, "shape": { "type": "circle" }, "opacity": { "value": 0.5, "random": true }, "size": { "value": 3, "random": true }, "line_linked": { "enable": true, "distance": 150, "color": "#ffffff", "opacity": 0.4, "width": 1 }, "move": { "enable": true, "speed": 1, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false } }, "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": true, "mode": "repulse" }, "onclick": { "enable": true, "mode": "push" }, "resize": true }, "modes": { "repulse": { "distance": 100, "duration": 0.4 }, "push": { "particles_nb": 4 } } }, "retina_detect": true });
+        
+        // --- Set initial language on page load ---
+        document.addEventListener('DOMContentLoaded', updateUIForLanguage);
     </script>
 </body>
 </html>

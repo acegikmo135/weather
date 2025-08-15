@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather App</title>
     
-    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -93,19 +91,22 @@
 </head>
 <body class="flex items-center justify-center min-h-screen p-4">
 
-    <!-- Particle.js container -->
     <div id="particles-js"></div>
 
     <div class="w-full max-w-md mx-auto content-container">
-        <!-- Main application card -->
         <div class="glass-card rounded-3xl shadow-2xl p-6 md:p-8 text-white text-center">
             
-            <h1 class="text-3xl md:text-4xl font-bold mb-2">Weather App</h1>
-            <p class="text-white/80 mb-6">Enter a city to get the latest forecast</p>
+            <h1 id="appTitle" class="text-3xl md:text-4xl font-bold mb-2">વેધર એપ</h1>
+            <p id="appSubtitle" class="text-white/80 mb-6">હવામાનની આગાહી મેળવવા માટે શહેરનું નામ દાખલ કરો</p>
+            
+            <div class="flex justify-end mb-4">
+                <button id="langSwitchBtn" class="bg-white/20 text-white border-2 border-white/30 rounded-full px-4 py-2 text-sm hover:bg-white/30 transition duration-300">
+                    Switch to English
+                </button>
+            </div>
 
-            <!-- Input form -->
             <div class="flex items-center space-x-2">
-                <input type="text" id="cityInput" placeholder="e.g., Rajkot" class="w-full bg-white/20 border-2 border-white/30 rounded-full px-5 py-3 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50 transition duration-300">
+                <input type="text" id="cityInput" placeholder="દા.ત., રાજકોટ" class="w-full bg-white/20 border-2 border-white/30 rounded-full px-5 py-3 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50 transition duration-300">
                 <button id="getWeatherBtn" class="bg-white text-blue-500 rounded-full p-3 hover:bg-opacity-90 transform hover:scale-110 transition duration-300 shadow-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -113,7 +114,6 @@
                 </button>
             </div>
             
-            <!-- Loading Spinner -->
             <div id="loader" class="hidden my-8">
                 <svg class="animate-spin h-10 w-10 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -121,41 +121,36 @@
                 </svg>
             </div>
 
-            <!-- Error Message Box -->
             <div id="errorBox" class="hidden bg-red-500/50 text-white p-4 rounded-xl mt-6">
                 <p id="errorMessage"></p>
             </div>
 
-            <!-- Weather information display section -->
             <div id="weatherInfo" class="weather-info-container mt-8">
-                <!-- City Name and Weather Icon -->
                 <div class="weather-item flex items-center justify-center gap-4 mb-4">
                     <h2 id="cityName" class="text-3xl font-semibold"></h2>
                     <div id="weatherIcon" class="w-16 h-16"></div>
                 </div>
                 
-                <!-- Temperature and Description -->
                 <div class="weather-item mb-6">
                     <p id="temperature" class="text-6xl font-bold"></p>
                     <p id="weatherDescription" class="text-xl capitalize text-white/80"></p>
                 </div>
                 
-                <!-- Additional Details Grid -->
                 <div class="grid grid-cols-2 gap-4 text-left">
                     <div class="weather-item glass-card p-4 rounded-xl">
-                        <p class="text-sm text-white/70">Humidity</p>
+                        <p id="humidityLabel" class="text-sm text-white/70">ભેજ</p>
                         <p id="humidity" class="text-2xl font-semibold"></p>
                     </div>
                     <div class="weather-item glass-card p-4 rounded-xl">
-                        <p class="text-sm text-white/70">Wind Speed</p>
+                        <p id="windSpeedLabel" class="text-sm text-white/70">પવનની ગતિ</p>
                         <p id="windSpeed" class="text-2xl font-semibold"></p>
                     </div>
                     <div class="weather-item glass-card p-4 rounded-xl">
-                        <p class="text-sm text-white/70">Feels Like</p>
+                        <p id="feelsLikeLabel" class="text-sm text-white/70">અનુભવાતી ગરમી</p>
                         <p id="feelsLike" class="text-2xl font-semibold"></p>
                     </div>
                     <div class="weather-item glass-card p-4 rounded-xl">
-                        <p class="text-sm text-white/70">Air Quality</p>
+                        <p id="aqiLabel" class="text-sm text-white/70">હવાની ગુણવત્તા</p>
                         <p id="aqi" class="text-2xl font-semibold"></p>
                     </div>
                 </div>
@@ -163,11 +158,55 @@
         </div>
     </div>
     
-    <!-- Particles.js script -->
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 
     <script>
+        // --- Language and Translations ---
+        const translations = {
+            en: {
+                appTitle: "Weather App",
+                appSubtitle: "Enter a city to get the latest forecast",
+                cityInputPlaceholder: "e.g., Rajkot",
+                langSwitchBtn: "Switch to Gujarati",
+                humidityLabel: "Humidity",
+                windSpeedLabel: "Wind Speed",
+                feelsLikeLabel: "Feels Like",
+                aqiLabel: "Air Quality",
+                aqiGood: "Good",
+                aqiFair: "Fair",
+                aqiModerate: "Moderate",
+                aqiPoor: "Poor",
+                aqiVeryPoor: "Very Poor",
+                errorNoCity: "Please enter a city name.",
+                errorCityNotFound: "City not found: ",
+                errorInvalidApiKey: "Invalid API Key. Please check your key in the script.",
+                errorAqiFetch: "Could not fetch air quality data.",
+                errorHttp: "HTTP error! status: "
+            },
+            gu: {
+                appTitle: "વેધર એપ",
+                appSubtitle: "હવામાનની આગાહી મેળવવા માટે શહેરનું નામ દાખલ કરો",
+                cityInputPlaceholder: "દા.ત., રાજકોટ",
+                langSwitchBtn: "Switch to English",
+                humidityLabel: "ભેજ",
+                windSpeedLabel: "પવનની ગતિ",
+                feelsLikeLabel: "અનુભવાતી ગરમી",
+                aqiLabel: "હવાની ગુણવત્તા",
+                aqiGood: "સારું",
+                aqiFair: "વાજબી",
+                aqiModerate: "મધ્યમ",
+                aqiPoor: "ખરાબ",
+                aqiVeryPoor: "ખૂબ જ ખરાબ",
+                errorNoCity: "કૃપા કરીને શહેરનું નામ દાખલ કરો.",
+                errorCityNotFound: "શહેર મળ્યું નથી: ",
+                errorInvalidApiKey: "અમાન્ય API કી. કૃપા કરીને સ્ક્રિપ્ટમાં તમારી કી તપાસો.",
+                errorAqiFetch: "હવાની ગુણવત્તાનો ડેટા મેળવી શકાયો નથી.",
+                errorHttp: "HTTP ભૂલ! સ્થિતિ: "
+            }
+        };
+
         // --- DOM Element References ---
+        const langSwitchBtn = document.getElementById('langSwitchBtn');
         const cityInput = document.getElementById('cityInput');
         const getWeatherBtn = document.getElementById('getWeatherBtn');
         const loader = document.getElementById('loader');
@@ -175,6 +214,14 @@
         const errorMessage = document.getElementById('errorMessage');
         const weatherInfoContainer = document.getElementById('weatherInfo');
         
+        // Elements to be translated
+        const appTitle = document.getElementById('appTitle');
+        const appSubtitle = document.getElementById('appSubtitle');
+        const humidityLabel = document.getElementById('humidityLabel');
+        const windSpeedLabel = document.getElementById('windSpeedLabel');
+        const feelsLikeLabel = document.getElementById('feelsLikeLabel');
+        const aqiLabel = document.getElementById('aqiLabel');
+
         const cityNameEl = document.getElementById('cityName');
         const weatherIconEl = document.getElementById('weatherIcon');
         const temperatureEl = document.getElementById('temperature');
@@ -187,6 +234,8 @@
         // --- API Configuration ---
         // IMPORTANT: Replace "YOUR_API_KEY" with your actual OpenWeatherMap API key.
         const apiKey = "dfe3aa984645945c48c888717a720b14";
+        
+        let currentLang = 'gu'; // Default language is Gujarati
 
         // --- Event Listeners ---
         getWeatherBtn.addEventListener('click', handleGetWeather);
@@ -195,12 +244,16 @@
                 handleGetWeather();
             }
         });
+        langSwitchBtn.addEventListener('click', switchLanguage);
+        
+        // Set initial language
+        updateUIForLanguage();
 
         // --- Main Function to Fetch and Display Weather ---
         async function handleGetWeather() {
             const city = cityInput.value.trim();
             if (!city) {
-                showError("Please enter a city name.");
+                showError(translations[currentLang].errorNoCity);
                 return;
             }
 
@@ -215,12 +268,12 @@
                 
                 if (!weatherResponse.ok) {
                     if (weatherResponse.status === 404) {
-                        throw new Error(`City not found: ${city}`);
+                        throw new Error(`${translations[currentLang].errorCityNotFound}${city}`);
                     } else if (weatherResponse.status === 401) {
-                         throw new Error("Invalid API Key. Please check your key in the script.");
+                         throw new Error(translations[currentLang].errorInvalidApiKey);
                     }
                     else {
-                        throw new Error(`HTTP error! status: ${weatherResponse.status}`);
+                        throw new Error(`${translations[currentLang].errorHttp}${weatherResponse.status}`);
                     }
                 }
                 const weatherData = await weatherResponse.json();
@@ -229,7 +282,7 @@
                 const { lat, lon } = weatherData.coord;
                 const airPollutionResponse = await fetch(`https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`);
                 if (!airPollutionResponse.ok) {
-                    throw new Error(`Could not fetch air quality data. Status: ${airPollutionResponse.status}`);
+                    throw new Error(translations[currentLang].errorAqiFetch);
                 }
                 const airPollutionData = await airPollutionResponse.json();
 
@@ -275,16 +328,41 @@
         function hideError() {
             errorBox.classList.add('hidden');
         }
+        
+        function switchLanguage() {
+            currentLang = currentLang === 'en' ? 'gu' : 'en';
+            updateUIForLanguage();
+            // Clear any old weather info when switching languages
+            weatherInfoContainer.classList.remove('visible');
+        }
+        
+        function updateUIForLanguage() {
+            const lang = translations[currentLang];
+            appTitle.textContent = lang.appTitle;
+            appSubtitle.textContent = lang.appSubtitle;
+            cityInput.placeholder = lang.cityInputPlaceholder;
+            langSwitchBtn.textContent = lang.langSwitchBtn;
+            humidityLabel.textContent = lang.humidityLabel;
+            windSpeedLabel.textContent = lang.windSpeedLabel;
+            feelsLikeLabel.textContent = lang.feelsLikeLabel;
+            aqiLabel.textContent = lang.aqiLabel;
+            
+            // If weather info is visible, update the labels and AQI text
+            if (weatherInfoContainer.classList.contains('visible')) {
+                const aqiValue = parseInt(aqiEl.textContent); // Get current AQI value
+                aqiEl.textContent = getAqiText(aqiValue);
+            }
+        }
 
         // --- Helper Functions ---
         function getAqiText(aqi) {
             switch (aqi) {
-                case 1: return "Good";
-                case 2: return "Fair";
-                case 3: return "Moderate";
-                case 4: return "Poor";
-                case 5: return "Very Poor";
-                default: return "Unknown";
+                case 1: return translations[currentLang].aqiGood;
+                case 2: return translations[currentLang].aqiFair;
+                case 3: return translations[currentLang].aqiModerate;
+                case 4: return translations[currentLang].aqiPoor;
+                case 5: return translations[currentLang].aqiVeryPoor;
+                default: return "N/A"; // Or handle this case appropriately
             }
         }
 
